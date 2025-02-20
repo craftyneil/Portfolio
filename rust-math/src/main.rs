@@ -1,201 +1,253 @@
-mod yo;
+//! This code was a project that helped me to learn rust's generics.
+//! The goal was to make a code that help us create sequence (arithmetic sequence and/or geometric sequence)
+//! and to also help the user calculate a term of the list or calculate the sum of terms that are in a range.
+//!
+//! # Example
+//!
+//! ```rust
+//! let my_sequence = SequenceVariant::Explicit(SequenceType::new_arithmetic(10));
+//!
+//! assert_eq!(my_sequence.reason(), 10);
+//!
+//! assert_eq!(my_sequence.sum_from_range());
+//! ```
 
-fn main() {}
+#![deny(rustdoc::invalid_rust_codeblocks)]
+#![feature(let_chains)]
 
-// #![allow(unused)]
-// extern crate proc_macro;
+use std::ops::{Deref, RangeInclusive};
 
-// use num::{pow::Pow, FromPrimitive, Num, ToPrimitive, Unsigned};
-// use rust_math::stringify_sequence_closure;
-// use std::fmt::{self, Debug};
+use num::{pow::Pow, traits::NumAssignOps, FromPrimitive, Num, ToPrimitive, Unsigned};
 
-// fn main() {
-//     let my_sequence: Sequence<u32, i32> = Sequence::from_recurence(
-//         1,
-//         //#[stringify_sequence_closure]
-//         |n| 5 + n,
-//     );
-//     // println!("{my_sequence:#?}");
-// }
+#[doc(hidden)]
+fn main() {
+    let example_of_sequence = SequenceVariant::Explicit {
+        formula: SequenceType::new_arithemtic(3),
+        initial_term: 0,
+    };
+}
 
-// type SequenceFormula<T, U> = Box<dyn Fn(T) -> U>;
+/// Enum that represent all the possible type of a Sequence
+///
+/// ## Note
+///
+/// I restreined myself to the arithmetic and geometric sequence.
+/// There is actually more type of sequence but the arithmetic and geometric one's are the easiest to use
+pub enum SequenceType<T>
+where
+    T: Num + Copy,
+{
+    /// Variant that represent an Arithmetic Sequence
+    Arithmetic {
+        /// Represent the reason of the arithmetic sequence. Sometimes this reason is called `r`
+        reason: T,
+    },
 
-// enum SequenceFormulaVariant<T, U>
-// where
-//     T: Num,
-//     U: Num,
-// {
-//     Arithmetic(Box<dyn Fn(T) -> U>),
-//     Geometric(Box<dyn Fn(T) -> U>),
-//     Other(Box<dyn Fn(T) -> U>),
-// }
+    /// Variant that represent an Geometric Sequence
+    Geometric {
+        /// Represent the reason of the geometric sequence. Sometimes this reason is called `q`
+        reason: T,
+    },
+}
 
-// impl<T, U> fmt::Debug for SequenceFormulaVariant<T, U>
-// where
-//     T: Num + fmt::Debug,
-//     U: Num + fmt::Debug,
-// {
-//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-//         match self {
-//             SequenceFormulaVariant::Arithmetic(_) => {
-//                 todo!();
-//             }
-//             SequenceFormulaVariant::Geometric(_) => todo!(),
-//             SequenceFormulaVariant::Other(_) => todo!(),
-//         }
-//     }
-// }
+impl<T: Num + Copy> SequenceType<T> {
+    /// create a new arithmetic sequence from the reason `r`
+    pub fn new_arithemtic(reason: T) -> Self {
+        Self::Arithmetic { reason }
+    }
 
-// impl<T: Num, U: Num> SequenceFormulaVariant<T, U> {
-//     fn new(formula: impl Fn(T) -> U + 'static) -> Self {
-//         if formula(T::one()) - formula(T::zero())
-//             == formula(T::one() + T::one()) - formula(T::one())
-//         {
-//             return Self::Arithmetic(Box::new(formula));
-//         } else if formula(T::one()) / formula(T::zero())
-//             == formula(T::one() + T::one()) / formula(T::one())
-//         {
-//             return Self::Geometric(Box::new(formula));
-//         }
-//         Self::Other(Box::new(formula))
-//     }
+    /// create a new geometric sequence from the reason `q`
+    pub fn new_geometric(reason: T) -> Self {
+        Self::Geometric { reason }
+    }
 
-//     fn reason(&self) -> Option<U> {
-//         match &self {
-//             SequenceFormulaVariant::Arithmetic(formula) => {
-//                 let formula = formula.as_ref();
-//                 Some(formula(T::one()) - formula(T::zero()))
-//             }
-//             SequenceFormulaVariant::Geometric(formula) => {
-//                 let formula = formula.as_ref();
-//                 Some(formula(T::one()) / formula(T::zero()))
-//             }
-//             SequenceFormulaVariant::Other(_) => None,
-//         }
-//     }
-// }
+    /// this function create a new sequence base on a function or a closure that takes a number and return the same type of number
+    /// The function will be used to calculate if it's a function of an [`SequenceType::Arithmetic`] sequence or a [`SequenceType::Geometric`] sequence
+    /// If the function belongs to neither of the proposed types, `from_fn` will return [`None`]
+    pub fn from_fn(formula: impl Fn(T) -> T) -> Option<Self> {
+        // this stop the programm from computing the values in each conditions
+        let f_0 = formula(T::zero());
+        let f_1 = formula(T::one());
+        let f_2 = formula(T::one() + T::one());
 
-// trait SequenceMethods<T, U> {
-//     fn nth_term(&self, n: impl Unsigned + ToPrimitive) -> U;
-//     // fn sum_of_term(&self, terms: RangeInclusive<impl Unsigned>) -> U;
-// }
+        // The formula for calculating the reason r of a arithmetic sequence is: U(n+1) - U(n)
+        // if the reason if the same for n=0 and n=1, then its an arithmetic sequence
+        let is_arithmetic = f_1 - f_0 == f_2 - f_1;
+        if is_arithmetic {
+            return Some(Self::new_arithemtic(f_1 - f_0));
+        }
 
-// #[derive(Debug)]
-// struct RecurenceSequence<T>
-// where
-//     T: Num,
-// {
-//     initial_term: T,
-//     formula: SequenceFormulaVariant<T, T>,
-// }
+        // The formula for calculating the reason q of a geometric sequence is: U(n+1)/U(n)
+        // if the reason if the same for n=0 and n=1, then its an geometric sequence
+        let is_geometric = f_1 / f_0 == f_2 / f_1;
+        if is_geometric {
+            return Some(Self::new_geometric(f_1 / f_0));
+        }
 
-// impl<T: Num> RecurenceSequence<T> {
-//     fn new(initial_term: T, formula: impl Fn(T) -> T + 'static) -> Self {
-//         Self {
-//             initial_term,
-//             formula: SequenceFormulaVariant::new(formula),
-//         }
-//     }
-// }
+        // if `None`, then the sequence provided is neither arithmetic, nor geometric
+        None
+    }
 
-// impl<T: Num + ToPrimitive + Clone> SequenceMethods<T, T> for RecurenceSequence<T> {
-//     fn nth_term(&self, n: impl Unsigned + ToPrimitive) -> T {
-//         let mut accumulator = self.initial_term.clone();
+    /// return the reason of the current sequence
+    pub fn reason(&self) -> T {
+        use SequenceType::*;
+        match self {
+            Arithmetic { reason } => *reason,
+            Geometric { reason } => *reason,
+        }
+    }
+}
 
-//         let formula = match &self.formula {
-//             SequenceFormulaVariant::Arithmetic(formula) => formula.as_ref(),
-//             SequenceFormulaVariant::Geometric(formula) => formula.as_ref(),
-//             SequenceFormulaVariant::Other(formula) => formula.as_ref(),
-//         };
+pub enum SequenceVariant<T>
+where
+    T: Num + Copy,
+{
+    Explicit {
+        formula: SequenceType<T>,
+        initial_term: T,
+    },
+    Recurence {
+        formula: SequenceType<T>,
+        initial_term: T,
+    },
+}
 
-//         for _ in 1..=n.to_u128().unwrap() {
-//             accumulator = formula(accumulator);
-//         }
+impl<T> Deref for SequenceVariant<T>
+where
+    T: Num + Copy,
+{
+    type Target = SequenceType<T>;
 
-//         accumulator
-//     }
+    /// this `impl` help us extract the formula of the sequence
+    fn deref(&self) -> &Self::Target {
+        match self {
+            SequenceVariant::Explicit { formula, .. } => formula,
+            SequenceVariant::Recurence { formula, .. } => formula,
+        }
+    }
+}
 
-//     // fn sum_of_term(&self, terms: RangeInclusive<impl Unsigned>) -> T {
-//     //     let mut accumulator = 0;
-//     //     for n in terms {
-//     //         accumulator += self.nth_term(n);
-//     //     }
-//     //     accumulator
-//     // }
-// }
+impl<T> SequenceVariant<T>
+where
+    T: Num + FromPrimitive + ToPrimitive + Pow<T, Output = T> + NumAssignOps + Copy,
+{
+    /// returns the initial term of the sequence of [`self`]
+    pub fn initial_term(&self) -> T {
+        match self {
+            SequenceVariant::Explicit { initial_term, .. } => *initial_term,
+            SequenceVariant::Recurence { initial_term, .. } => *initial_term,
+        }
+    }
+    /// Calculate the nth term of a Sequence based on the variant [`SequenceVariant`] and the type [`SequenceType`]
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// let example_of_sequence = SequenceVariant::Explicit {
+    ///     formula: SequenceType::new_arithemtic(3),
+    ///     initial_term: 0,
+    /// };
+    ///
+    /// assert_eq!(6, example_of_sequence.nth_term(2));
+    /// ```
+    pub fn nth_term<U: Unsigned + ToPrimitive>(&self, n: U) -> T {
+        use SequenceVariant::*;
+        match self {
+            Explicit {
+                formula: sequence_type,
+                initial_term,
+            } => match sequence_type {
+                SequenceType::Arithmetic { reason } => {
+                    *initial_term + from_unsigned_to_num::<U, T>(n) * (*reason)
+                }
+                SequenceType::Geometric { reason } => {
+                    *initial_term * (*reason).pow(from_unsigned_to_num::<U, T>(n))
+                }
+            },
+            Recurence {
+                formula: sequence_type,
+                initial_term,
+            } => match sequence_type {
+                SequenceType::Arithmetic { reason } => {
+                    let mut result = *initial_term;
+                    // we add the reason n times with a loop because it's a sequence defined by recurence
+                    for _ in 0..=n.to_u128().unwrap() {
+                        result += *reason;
+                    }
+                    result
+                }
+                SequenceType::Geometric { reason } => {
+                    let mut result = *initial_term;
+                    // we add the reason n times with a loop because it's a sequence defined by recurence
+                    for _ in 0..=n.to_u128().unwrap() {
+                        result *= *reason;
+                    }
+                    result
+                }
+            },
+        }
+    }
 
-// impl<T: Unsigned + ToPrimitive, U: Num + Clone + FromPrimitive + 'static + Pow<T, Output = U>>
-//     From<RecurenceSequence<U>> for Option<ExplicitSequence<T, U>>
-// {
-//     fn from(value: RecurenceSequence<U>) -> Self {
-//         match value.formula {
-//             SequenceFormulaVariant::Arithmetic(_) => Some(ExplicitSequence::new(move |n: T| {
-//                 value.initial_term.clone()
-//                     + value.formula.reason().unwrap()
-//                         * FromPrimitive::from_u128(n.to_u128().unwrap()).unwrap()
-//             })),
-//             SequenceFormulaVariant::Geometric(_) => Some(ExplicitSequence::new(move |n: T| {
-//                 value.initial_term.clone() * value.formula.reason().unwrap().pow(n)
-//             })),
-//             SequenceFormulaVariant::Other(_) => None,
-//         }
-//     }
-// }
+    /// This function make the sum of all elements of the range passed into the function `self.nth_term`
+    pub fn sum_from_range<U: Unsigned + ToPrimitive + Copy>(&self, range: RangeInclusive<U>) -> T {
+        use std::ops::Bound::Included;
+        use std::ops::RangeBounds as _;
 
-// #[derive(Debug)]
-// struct ExplicitSequence<T, U>
-// where
-//     T: Unsigned,
-//     U: Num,
-// {
-//     formula: SequenceFormulaVariant<T, U>,
-// }
+        if let Included(&start_of_range) = range.start_bound()
+            && let Included(&end_of_range) = range.end_bound()
+        {
+            // the +1 is there because whe use an RangeInclusive
+            let range_len = from_unsigned_to_num::<U, T>(end_of_range - start_of_range) + T::one();
+            match **self {
+                SequenceType::Arithmetic { .. } => {
+                    // represent the number 2 with generics
+                    let two = T::one() + T::one();
 
-// impl<T: Unsigned, U: Num> ExplicitSequence<T, U> {
-//     fn new(formula: impl Fn(T) -> U + 'static) -> Self {
-//         Self {
-//             formula: SequenceFormulaVariant::new(formula),
-//         }
-//     }
-// }
+                    // compute the formula for an arithmetic progression
+                    // see more at https://en.wikipedia.org/wiki/Arithmetic_progression
+                    let sum = range_len
+                        * (self.nth_term(end_of_range) + self.nth_term(start_of_range))
+                        / two;
 
-// #[derive(Debug)]
-// struct Sequence<T, U>
-// where
-//     T: Unsigned,
-//     U: Num,
-// {
-//     recurence_part: Option<RecurenceSequence<U>>,
-//     explicit_part: Option<ExplicitSequence<T, U>>,
-// }
+                    return sum;
+                }
+                SequenceType::Geometric { .. } => {
+                    // compute the formula for a geometric serie
+                    // see more at https://en.wikipedia.org/wiki/Geometric_series
+                    let first_sum = self.initial_term()
+                        * ((T::one()
+                            - self
+                                .reason()
+                                .pow(from_unsigned_to_num::<U, T>(end_of_range)))
+                            / (T::one() - self.reason()));
 
-// impl<
-//         T: Unsigned + ToPrimitive,
-//         U: Num + Clone + Copy + FromPrimitive + Pow<T, Output = U> + 'static,
-//     > Sequence<T, U>
-// {
-//     fn from_recurence(initial_term: U, formula: impl Fn(U) -> U + 'static + Copy) -> Self {
-//         Self {
-//             recurence_part: Some(RecurenceSequence::new(initial_term, formula)),
-//             explicit_part: RecurenceSequence::new(initial_term, formula).into(),
-//         }
-//     }
+                    let second_sum = self.initial_term()
+                        * ((T::one()
+                            - self
+                                .reason()
+                                .pow(from_unsigned_to_num::<U, T>(start_of_range)))
+                            / (T::one() - self.reason()));
 
-//     fn from_explicit(formula: impl Fn(T) -> U + 'static) -> Self {
-//         Self {
-//             recurence_part: None,
-//             explicit_part: Some(ExplicitSequence::new(formula)),
-//         }
-//     }
+                    return first_sum - second_sum;
+                }
+            }
+        };
+        // [`range.start_bound()`] and [`range.end_bound()`] will always return the [`Included`] variant
+        // so the previous if let should always be true
+        unreachable!()
+    }
+}
 
-//     fn new(
-//         initial_term: U,
-//         recurence_formula: impl Fn(U) -> U + 'static,
-//         explicit_formula: impl Fn(T) -> U + 'static,
-//     ) -> Self {
-//         Self {
-//             recurence_part: Some(RecurenceSequence::new(initial_term, recurence_formula)),
-//             explicit_part: Some(ExplicitSequence::new(explicit_formula)),
-//         }
-//     }
-// }
+/// This helper function convert any unsigned integer into any number (integers, unsigned integers, floats) like this: <br>
+/// [`T1`] -> [`u128`] -> [`T2`]
+///
+/// The type [`u128`] is used to prevent wrapping if the user used an `unsigned_integer` that is extremely big,
+/// or just of type [`u128`]
+#[doc(hidden)]
+fn from_unsigned_to_num<T1, T2>(unsigned_num: T1) -> T2
+where
+    T2: Num + FromPrimitive,    // FromPrimitive is needed just for the conversion
+    T1: Unsigned + ToPrimitive, // same for ToPrimitive
+{
+    FromPrimitive::from_u128(unsigned_num.to_u128().unwrap()).unwrap() // can't fail so I used unwrap
+}
