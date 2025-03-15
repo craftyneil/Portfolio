@@ -14,18 +14,11 @@
 
 #![deny(rustdoc::invalid_rust_codeblocks)]
 #![feature(let_chains)]
+#![allow(unused)]
 
 use std::ops::{Deref, RangeInclusive};
 
-use num::{pow::Pow, traits::NumAssignOps, FromPrimitive, Num, ToPrimitive, Unsigned};
-
-#[doc(hidden)]
-fn main() {
-    let example_of_sequence = SequenceVariant::Explicit {
-        formula: SequenceType::new_arithemtic(3),
-        initial_term: 0,
-    };
-}
+use num::{FromPrimitive, Num, ToPrimitive, Unsigned, pow::Pow, traits::NumAssignOps};
 
 /// Enum that represent all the possible type of a Sequence
 ///
@@ -33,6 +26,7 @@ fn main() {
 ///
 /// I restreined myself to the arithmetic and geometric sequence.
 /// There is actually more type of sequence but the arithmetic and geometric one's are the easiest to use
+#[derive(Debug, PartialEq)]
 pub enum SequenceType<T>
 where
     T: Num + Copy,
@@ -50,9 +44,13 @@ where
     },
 }
 
+#[rust_math_macro::test_builder]
 impl<T: Num + Copy> SequenceType<T> {
     /// create a new arithmetic sequence from the reason `r`
-    pub fn new_arithemtic(reason: T) -> Self {
+    #[test_data(
+        (1) => SequenceType { reason: 1 }
+    )]
+    pub fn new_arithmetic(reason: T) -> Self {
         Self::Arithmetic { reason }
     }
 
@@ -74,7 +72,7 @@ impl<T: Num + Copy> SequenceType<T> {
         // if the reason if the same for n=0 and n=1, then its an arithmetic sequence
         let is_arithmetic = f_1 - f_0 == f_2 - f_1;
         if is_arithmetic {
-            return Some(Self::new_arithemtic(f_1 - f_0));
+            return Some(Self::new_arithmetic(f_1 - f_0));
         }
 
         // The formula for calculating the reason q of a geometric sequence is: U(n+1)/U(n)
@@ -129,7 +127,7 @@ where
 
 impl<T> SequenceVariant<T>
 where
-    T: Num + FromPrimitive + ToPrimitive + Pow<T, Output = T> + NumAssignOps + Copy,
+    T: Num + FromPrimitive + ToPrimitive + NumAssignOps + Copy,
 {
     /// returns the initial term of the sequence of [`self`]
     pub fn initial_term(&self) -> T {
@@ -143,14 +141,19 @@ where
     /// # Example
     ///
     /// ```rust
-    /// let example_of_sequence = SequenceVariant::Explicit {
-    ///     formula: SequenceType::new_arithemtic(3),
+    /// # use rust_math::SequenceVariant;
+    /// # use rust_math::SequenceType;
+    /// let example_of_sequence: SequenceVariant<i32> = SequenceVariant::Explicit {
+    ///     formula: SequenceType::new_arithmetic(3),
     ///     initial_term: 0,
     /// };
     ///
-    /// assert_eq!(6, example_of_sequence.nth_term(2));
+    /// assert_eq!(6, example_of_sequence.nth_term(2u8));
     /// ```
-    pub fn nth_term<U: Unsigned + ToPrimitive>(&self, n: U) -> T {
+    pub fn nth_term<U: Unsigned + ToPrimitive>(&self, n: U) -> T
+    where
+        T: Pow<U, Output = T>,
+    {
         use SequenceVariant::*;
         match self {
             Explicit {
@@ -160,9 +163,7 @@ where
                 SequenceType::Arithmetic { reason } => {
                     *initial_term + from_unsigned_to_num::<U, T>(n) * (*reason)
                 }
-                SequenceType::Geometric { reason } => {
-                    *initial_term * (*reason).pow(from_unsigned_to_num::<U, T>(n))
-                }
+                SequenceType::Geometric { reason } => *initial_term * (*reason).pow(n),
             },
             Recurence {
                 formula: sequence_type,
@@ -189,7 +190,11 @@ where
     }
 
     /// This function make the sum of all elements of the range passed into the function `self.nth_term`
-    pub fn sum_from_range<U: Unsigned + ToPrimitive + Copy>(&self, range: RangeInclusive<U>) -> T {
+    pub fn sum_from_range<U: Unsigned + ToPrimitive + Copy>(&self, range: RangeInclusive<U>) -> T
+    where
+        // this is here to satisfy the contrains of the function `nth_term()`
+        T: Pow<U, Output = T>,
+    {
         use std::ops::Bound::Included;
         use std::ops::RangeBounds as _;
 
@@ -211,22 +216,14 @@ where
 
                     return sum;
                 }
-                SequenceType::Geometric { .. } => {
+                SequenceType::Geometric { reason } => {
                     // compute the formula for a geometric serie
                     // see more at https://en.wikipedia.org/wiki/Geometric_series
                     let first_sum = self.initial_term()
-                        * ((T::one()
-                            - self
-                                .reason()
-                                .pow(from_unsigned_to_num::<U, T>(end_of_range)))
-                            / (T::one() - self.reason()));
+                        * ((T::one() - reason.pow(end_of_range)) / (T::one() - reason));
 
                     let second_sum = self.initial_term()
-                        * ((T::one()
-                            - self
-                                .reason()
-                                .pow(from_unsigned_to_num::<U, T>(start_of_range)))
-                            / (T::one() - self.reason()));
+                        * ((T::one() - reason.pow(start_of_range)) / (T::one() - reason));
 
                     return first_sum - second_sum;
                 }
@@ -234,7 +231,7 @@ where
         };
         // [`range.start_bound()`] and [`range.end_bound()`] will always return the [`Included`] variant
         // so the previous if let should always be true
-        unreachable!()
+        unreachable!("The range should always have a start bound and an end bound")
     }
 }
 
@@ -251,3 +248,5 @@ where
 {
     FromPrimitive::from_u128(unsigned_num.to_u128().unwrap()).unwrap() // can't fail so I used unwrap
 }
+
+fn main() {}

@@ -1,0 +1,11 @@
+/media/craftyneil/TOSHIBA EXT/Github/Portfolio/rust-math-2/rust-math-macro/target/debug/deps/libquote-0b6565c31f4cf909.rmeta: /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/lib.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/ext.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/format.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/ident_fragment.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/to_tokens.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/runtime.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/spanned.rs
+
+/media/craftyneil/TOSHIBA EXT/Github/Portfolio/rust-math-2/rust-math-macro/target/debug/deps/quote-0b6565c31f4cf909.d: /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/lib.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/ext.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/format.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/ident_fragment.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/to_tokens.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/runtime.rs /home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/spanned.rs
+
+/home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/lib.rs:
+/home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/ext.rs:
+/home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/format.rs:
+/home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/ident_fragment.rs:
+/home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/to_tokens.rs:
+/home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/runtime.rs:
+/home/craftyneil/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/quote-1.0.39/src/spanned.rs:
