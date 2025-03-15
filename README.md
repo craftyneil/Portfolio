@@ -35,3 +35,6 @@ La macro du projet qui génère des tests deviendra très probablement une libra
 ## Screaming_hunter
 
 Le but de ce projet était de réecrire le jeux https://mystoxi.itch.io/screaming-hunter fait par un moi et mes amis de GodoScript à Rust en utilisant le moteur de jeux Bevy. Le deuxième objectif était de pouvoir faire apparaitre plus d'entités (les vagues rouges simbolisant le cris de la chauve-souris) sans faire laguer l'ordinateur de l'utilisateur en utilisant les performances de Rust.
+
+### Écran d'accueil du jeux
+![Capture d'écran du jeux Screaming Hunter](capture-decran-screaming-hunter.png)
