@@ -28,3 +28,10 @@ assert_eq!(my_sequence.reason(), 3);
 assert_eq!(my_sequence.nth_term(3), 27);
 // U(n) = 1 * 3^n et n = 3 donc U(3) = 1 *3^3 = 27
 ```
+
+#### Note
+La macro du projet qui génère des tests deviendra très probablement une librairie pour rust.
+
+## Screaming_hunter
+
+Le but de ce projet était de réecrire le jeux https://mystoxi.itch.io/screaming-hunter fait par un moi et mes amis de GodoScript à Rust en utilisant le moteur de jeux Bevy. Le deuxième objectif était de pouvoir faire apparaitre plus d'entités (les vagues rouges simbolisant le cris de la chauve-souris) sans faire laguer l'ordinateur de l'utilisateur en utilisant les performances de Rust.
