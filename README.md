@@ -30,11 +30,17 @@ assert_eq!(my_sequence.nth_term(3), 27);
 ```
 
 #### Note
+
 La macro du projet qui génère des tests deviendra très probablement une librairie pour rust.
 
 ## Screaming_hunter
 
 Le but de ce projet était de réecrire le jeux https://mystoxi.itch.io/screaming-hunter fait par un moi et mes amis de GodoScript à Rust en utilisant le moteur de jeux Bevy. Le deuxième objectif était de pouvoir faire apparaitre plus d'entités (les vagues rouges simbolisant le cris de la chauve-souris) sans faire laguer l'ordinateur de l'utilisateur en utilisant les performances de Rust.
 
+### Petite explication du jeux
+
+Le joueur joue une chauve souris qui doit attraper et manger une souris cacher dan le noir. Pour la trouver, la chauve-souris doit poursser un cris (barre espace). Ce cris est envoyer dans toute les directions et rebondi sur les obstacles (comme par example la souris) et revient vers la chauve souris. La chauve-souris peut ainsi aller sur la souris et la manger, Victoire !
+
 ### Écran d'accueil du jeux
+
 ![Capture d'écran du jeux Screaming Hunter](capture-decran-screaming-hunter.png)
