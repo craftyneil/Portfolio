@@ -53,4 +53,4 @@ Ce projet ma permit d'apprendre comment utiliser la librairie pygame pour faire 
 
 ### Image du jeux
 
-![Capture d'écran du jeux snake écrit en python](Snake\ python\ gameplay.png)
+![Capture d'écran du jeux snake écrit en python](Snake-python-gameplay.png)
