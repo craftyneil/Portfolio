@@ -80,10 +80,10 @@ C'est un projet que j'ai commencé au lycée en spécialité SI. Le but est de c
 
 L'objectif était de faire communiqué l'application écrite en Rust avec la carte arduino codé en Arduino.
 
-## Exercice MP2I
+## Exercice MP2I
 
 C'est un exercice sur l'algorithme de quine que j'ai commencé un peux à la MP2I de Vannes avec des élèves de l'école pendant une journée d'intégration. Ils le faisaient en OCaml et je me suis dit que se serait une bonne idée de le faire un rust pour m'entrainer sur la récursivité. Le pdf de l'exercice et compris dans le fichier du projet.
 
-## Rock Paper Scissor 
+## Rock Paper Scissor 
 
 Ce projet avait pour but de recréer le jeux pierre feuille sciseau dans le terminale. Les joueurs choisissent leur pseudo et commmence la partie en choisissant pierre, papier ou sciseau de manière caché, cela permet d'éviter toutes triches (sauf si le joueur adverse regarde le choix que l'on tape sur le clavier). Un compteur se met alors en route et au bout de 3 secondes, le pseudo du gagnant est affiché ainsi que son choix (pierre, papier ou sciseau)
