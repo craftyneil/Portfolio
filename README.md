@@ -55,6 +55,10 @@ Le but de ce projet était de réécrire le jeu https://mystoxi.itch.io/screamin
 
 Le joueur joue une chauve-souris qui doit attraper et manger une souris cachée dans le noir. Pour la trouver, la chauve-souris doit pousser un cri (barre espace). Ce cri est envoyé dans toutes les directions et il rebondit sur les obstacles (comme par example la souris) et revient vers la chauve-souris. La chauve-souris peut ainsi aller sur la souris et la manger. Victoire !
 
+#### Lien vers le jeu originale 
+
+https://mystoxi.itch.io/screaming-hunter
+
 ### Écran d'accueil du jeux
 
 ![Capture d'écran du jeu Screaming Hunter](capture-decran-screaming-hunter.png)
