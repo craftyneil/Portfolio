@@ -1,0 +1,175 @@
+#![allow(unused)]
+
+pub mod util {
+    use std::io::{self, Write};
+    use std::error;
+    
+    pub fn input_until<T, E: error::Error>(
+        prompt: &str, 
+        conversion_function: impl Fn(String) -> Result<T, E>
+    ) -> T {
+        let mut return_value: Option<T> = None;
+        
+        while return_value.is_none() {
+            print!("{}", prompt);
+            io::stdout().flush().unwrap();
+            
+            let mut tmp_value = String::with_capacity(12);
+            let _ = io::stdin().read_line(&mut tmp_value).unwrap();
+            
+            match conversion_function(tmp_value) {
+                Ok(value) => return_value = Some(value),
+                Err(error) => println!("{}", error)
+            }
+        }
+        
+        return_value.unwrap()
+    }
+}
+
+pub mod game {
+    pub(super) mod player {
+        use thiserror::Error;
+        use std::fmt;
+    
+        #[derive(Clone)]
+        pub(super) enum PlayerChoice {
+            Rock,
+            Paper,
+            Scissor
+        }
+        
+        impl fmt::Display for PlayerChoice {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+                match self {
+                    PlayerChoice::Rock => write!(f, "rock"),
+                    PlayerChoice::Paper => write!(f, "paper"),
+                    PlayerChoice::Scissor => write!(f, "scissor"),
+                }
+            }
+        }
+        
+        #[derive(Error, Debug)]
+        pub(super) enum PlayerChoiceError {
+            #[error("you cannot make a empty choice")]
+            EmptyChoice,
+            #[error("your choice was not written correctly")]
+            InvalidChoice
+        }
+        
+        impl TryFrom<String> for PlayerChoice {
+            type Error = PlayerChoiceError;
+            
+            fn try_from(choice: String) -> Result<Self, <Self as TryFrom<String>>::Error> {
+                match choice.to_lowercase().trim() {
+                    "rock" => Ok(PlayerChoice::Rock),
+                    "paper" => Ok(PlayerChoice::Paper),
+                    "scissor" => Ok(PlayerChoice::Scissor),
+                    "" => Err(PlayerChoiceError::EmptyChoice),
+                    _ => Err(PlayerChoiceError::InvalidChoice)
+                }
+            }
+        }
+        
+        pub(super) struct UnitialisedPlayer {
+            pub(super) name: String
+        }
+        
+        impl UnitialisedPlayer {
+            pub(super) fn new(name: String) -> Self {
+                Self { name }
+            }
+            
+            pub(super) fn input_name() -> String {
+                use crate::util;
+                util::input_until(
+                    "How do you want to be called ? : ",
+                    |possible_name| -> Result<String, PlayerError> {
+                        if possible_name.is_empty() {
+                            return Err(PlayerError::InvalidName(PlayerNameError::EmptyName));
+                        }
+                        
+                        if possible_name.len() > 12 {
+                            return Err(PlayerError::InvalidName(PlayerNameError::TooLongName));
+                        }
+                        
+                        if !possible_name.is_ascii() {
+                            return Err(PlayerError::InvalidName(PlayerNameError::NotAscii));
+                        }
+                        
+                        Ok(possible_name)
+                    }
+                )
+            }
+            
+            pub(super) fn choose(self, choice: PlayerChoice) -> Player {
+                Player {
+                    choice,
+                    name: self.name
+                }
+            }
+
+            pub(super) fn input_choice(&self) -> PlayerChoice {
+                use crate::util;
+                util::input_until(
+                    &format!("{}, choose between rock, paper and scissor", self.name),
+                    |possible_choice| -> Result<PlayerChoice, PlayerError> {
+                        match PlayerChoice::try_from(possible_choice) {
+                            Err(error) => Err(PlayerError::ChoiceError(error)),
+                            Ok(choice) => Ok(choice)
+                        }
+                    }
+                )
+            }
+        }
+        
+        pub(super) struct Player {
+            pub(super) choice: PlayerChoice,
+            pub(super) name: String
+        }
+        
+        impl Player {
+            pub(super) fn choice(&self) -> &PlayerChoice {
+                &self.choice
+            }
+            pub(super) fn name(&self) -> &str {
+                &self.name
+            }
+        }
+        
+        #[derive(Error, Debug)]
+        pub(super) enum PlayerError {
+            #[error("{0}")]
+            ChoiceError(PlayerChoiceError),
+            #[error("{0}")]
+            InvalidName(PlayerNameError)
+        }
+        
+        #[derive(Error, Debug)]
+        pub(super) enum PlayerNameError {
+            #[error("you cannot choose an empty name")]
+            EmptyName,
+            #[error("your name is too long and should not exceed 12 caracters")]
+            TooLongName,
+            #[error("you cannot use special caracters in your name")]
+            NotAscii
+        }
+        
+        pub(super) struct Winner(Player);
+        
+        impl fmt::Display for Winner {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+                write!(
+                    f,
+                    "the winner of the match is {} with {}",
+                    self.0.name(),
+                    self.0.choice()
+                )
+            }
+        }
+    }
+}
+
+fn main() {
+    println!("Hello, world!");
+}

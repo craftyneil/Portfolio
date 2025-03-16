@@ -1,6 +1,8 @@
 # Portfolio
 
-Ici se trouve mes projets les plus importants
+Ici se trouve tout mes projets de programmation 
+
+# Pricipaux Projets
 
 ## Rust-math
 
@@ -26,7 +28,7 @@ assert_eq!(my_sequence.reason(), 3);
 // J'ai fait en sorte que l'utilisateur de puisse pas calculer le terme n 
 // avec n un nombre négatif car n doit être un entier naturel
 assert_eq!(my_sequence.nth_term(3), 27);
-// U(n) = 1 * 3^n et n = 3 donc U(3) = 1 *3^3 = 27
+// U(n) = 1 * 3^n et n = 3 donc U(3) = 1 * 3^3 = 27
 ```
 
 #### Note
@@ -44,3 +46,11 @@ Le joueur joue une chauve souris qui doit attraper et manger une souris cacher d
 ### Écran d'accueil du jeux
 
 ![Capture d'écran du jeux Screaming Hunter](capture-decran-screaming-hunter.png)
+
+## Snake en python
+
+Ce projet ma permit d'apprendre comment utiliser la librairie pygame pour faire des jeux en python
+
+### Image du jeux
+
+![Capture d'écran du jeux snake écrit en python](Snake\ python\ gameplay.png)

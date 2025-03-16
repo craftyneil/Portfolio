@@ -1,0 +1,24 @@
+* {
+    margin: 0;
+    padding: 0;
+    /*box-shadow: 0px 0px 20px red;*/
+}
+
+ul {
+    list-style-type: none;
+}
+
+header {
+    padding: 10px;
+}
+
+header, header nav ul, header div.login {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header h1, header nav ul li, header div.login a {
+    padding-right: 50px;
+}
+
